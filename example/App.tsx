@@ -2,18 +2,20 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import type { NativeSyntheticEvent } from "react-native";
 import {
   NativeModules,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   useColorScheme,
   View,
 } from "react-native";
 // @ts-expect-error no type definitions available
 import { version as coreVersion } from "react-native/Libraries/Core/ReactNativeVersion";
-import { Colors, Header } from "react-native/Libraries/NewAppScreen";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 // @ts-expect-error no type definitions available
 import { isAsyncDebugging } from "react-native/Libraries/Utilities/DebugEnvironment";
 
@@ -216,7 +218,22 @@ export function App(props: AppProps): React.ReactElement<AppProps> {
         onLayout={setIsFabric}
         style={styles.body}
       >
-        <Header />
+        <View style={{height: 50}} >
+          <Text style={{fontWeight: 'bold'}}>React Native {getReactNativeVersion()}</Text>
+        </View>
+        <View style={styles.group}>
+          <View style={{flexDirection: "row", justifyContent: "center"}}>
+            {[...Array(10)].map((_, index) => (
+              <Pressable key={index} style={{width: 25, height: 25, backgroundColor: 'yellow', margin: 2}}
+                  onPress={() => console.log(`Pressed ${index}`)}
+                  onBlur={() => console.log(`Blurred ${index}`)}
+                  onFocus={() => console.log(`Focused ${index}`)}>
+                <Text style={{textAlign: "center", textAlignVertical: "center"}}>{index}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+        <TextInput style={{height: 40, borderColor: 'gray', borderWidth: 1}} onBlur={() => console.log('blur input')} onFocus={() => console.log('focus input')}/>
         <DevMenu />
         <View style={styles.group}>
           <Feature value={localStorageStatus}>window.localStorage</Feature>

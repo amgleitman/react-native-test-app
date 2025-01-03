@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/react-native-test-app/trunk/schema.json",
+  "$schema": "../schema.json",
   "name": "Example",
   "displayName": "Example",
   "components": [
@@ -11,6 +11,11 @@
       "appKey": "Example",
       "displayName": "App (modal)",
       "presentationStyle": "modal"
+    },
+    {
+      "appKey": "Example",
+      "displayName": "App (panel)",
+      "presentationStyle": "panel"
     }
   ],
   "resources": {

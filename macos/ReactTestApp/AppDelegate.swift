@@ -78,6 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private enum WindowSize {
         static let defaultSize = CGSize(width: 640, height: 480)
         static let modalSize = CGSize(width: 586, height: 326)
+        static let panelSize = CGSize(width: 400, height: 300)
     }
 
     private func showReactMenu() {
@@ -200,6 +201,20 @@ extension AppDelegate {
         }
     }
 
+    private func monitorFirstResponder(of window: NSWindow) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak window] in
+            guard let window = window else {
+                return
+            }
+            if let firstResponder = window.firstResponder {
+                NSLog("First responder is \(firstResponder)")
+            } else {
+                NSLog("First responder is nil")
+            }
+            self.monitorFirstResponder(of: window)
+        }
+    }
+
     private func present(_ component: Component) {
         guard let window = mainWindow,
               let host = reactInstance.host
@@ -246,6 +261,38 @@ extension AppDelegate {
             )
 
             window.contentViewController?.presentAsModalWindow(viewController)
+
+        case "panel":
+            let panel = NSPanel(contentRect: .zero,
+                                styleMask: [.titled, .fullSizeContentView, .utilityWindow, .resizable, .closable],
+                                    backing: .buffered,
+                                      defer: false)
+            viewController.view.frame = NSRect(size: WindowSize.panelSize)
+
+            panel.isFloatingPanel = true
+            panel.isMovableByWindowBackground = true
+            panel.titlebarAppearsTransparent = true
+            panel.titleVisibility = .hidden
+            panel.level = .floating
+            panel.autorecalculatesKeyViewLoop = true
+            panel.isReleasedWhenClosed = false
+
+            contentDidAppearToken = NotificationCenter.default.addObserver(
+                forName: .RCTContentDidAppear,
+                object: viewController.view,
+                queue: nil,
+                using: { [ weak self] _ in
+                    (viewController.view as? RCTRootView)?.contentView.frame = NSRect(size: WindowSize.panelSize)
+                    if let token = self?.contentDidAppearToken {
+                        NotificationCenter.default.removeObserver(token)
+                    }
+                }
+            )
+
+            monitorFirstResponder(of: panel)
+
+            panel.contentViewController = viewController
+            mainWindow?.addChildWindow(panel, ordered: .above)
 
         default:
             window.title = title

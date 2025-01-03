@@ -120,7 +120,7 @@ export function generateSchema(docs = {}) {
           presentationStyle: {
             description: "The style in which to present your component.",
             type: "string",
-            enum: ["default", "modal"],
+            enum: ["default", "modal", "panel"],
           },
           slug: {
             description:
